@@ -1,3 +1,4 @@
+项目git地址：https://gitee.com/lvhonlgong/bj260706-data-agent.git
 元数据知识库：
 	元数据库:
 		1. 表信息  2.字段信息  3.指标信息 4.字段指标关系信息
