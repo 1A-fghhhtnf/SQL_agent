@@ -42,5 +42,5 @@ es:
 
 llm:
   model_name: deepseek-flash
-  api_key: <deepseek_api_key>
+  api_key: "${oc.env:DEEPSEEK_API_KEY}"
   base_url: https://api.deepseek.com
