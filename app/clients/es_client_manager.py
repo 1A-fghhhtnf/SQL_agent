@@ -83,5 +83,5 @@ if __name__ == '__main__':
                  "image": "apple.png"}
             ]
         )
-        await es_client_manager.close()
+        # await es_client_manager.close()
     asyncio.run(test_doc())

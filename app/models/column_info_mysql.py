@@ -6,6 +6,9 @@ from app.models.base import Base
 
 
 class ColumnInfoMySQL(Base):
+    """
+        持久层ORM模型，通过持久层框架跟DB交互 只用于持久层
+    """
     __tablename__ = "column_info"
 
     id: Mapped[str] = mapped_column(

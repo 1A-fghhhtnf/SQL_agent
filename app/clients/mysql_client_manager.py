@@ -2,7 +2,6 @@ import asyncio
 
 from sqlalchemy import text, update, Result
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, AsyncSession, async_sessionmaker
-from watchfiles import awatch
 
 from app.conf.app_config import DBConfig, app_config
 from app.models.table_info_mysql import TableInfoMySQL
@@ -21,7 +20,7 @@ class MysqlClientManager:
         return f"mysql+asyncmy://{self.db_config.user}:{self.db_config.password}@{self.db_config.host}:{self.db_config.port}/{self.db_config.database}?charset=utf8mb4"
 
     def init(self):
-        self.engine = create_async_engine(url=self._get_url(), echo=True,  # 设置连接池最大空闲连接数
+        self.engine = create_async_engine(url=self._get_url(), echo=False,  # 设置连接池最大空闲连接数
             pool_size=10,  pool_pre_ping=True)
         # 基于引擎对象产生session工厂对象 默认事务自动开启
         self.session_factory = async_sessionmaker(bind=self.engine, autobegin=True,autoflush=True, expire_on_commit=True)
