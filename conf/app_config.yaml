@@ -42,5 +42,5 @@ es:
 
 llm:
   model_name: deepseek-flash
-  api_key: <deepseek_api_key>
+  api_key: sk-713068e9ff774c8ab4ee484e9762c3eb
   base_url: https://api.deepseek.com

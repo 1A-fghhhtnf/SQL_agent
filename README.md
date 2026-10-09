@@ -203,10 +203,33 @@ POST goods/_search
 }
 
 
+LangGraph: 核心概念
+    Node节点: 业务处理逻辑 对应一个函数（同步获取异步）
+        这些函数用于实现智能体的逻辑处理。它们以当前状态作为输入，进行相应的计算或操作，然后返回更新后的状态。
+    State状态：各个节点共享进行读写操作
+        当前状态的节点共享数据结构
+    Edge边：节点之间依赖关系 支持固定边、条件边
+        决定下一个要执行的节点。它们可以是基于条件的分支处理，也可以是固定的跳转方式。
 
+    问题1：在某些节点中，需要调用不同持久层对象对MySQL，或者Qdrant，或ES进行数据查询，如何实现？
+    解决方案：在节点中接收runtime对象，在runtime对象中包含属性：context(上下文)，存放节点所依赖对象：例如：dw,meta持久层、es持久层、qdrant持久层对象
+    具体使用：
+        1.定义runtime中context上下文包装数据定义对象 采用：TypedDict定义
+        2.创建StateGraph（context_schema=TypedDict类型类）通过context_schema指定context上下文结构定义
+        3.调用graph需要通过context指定context上下文数据
+        4.在节点参数中接收runtime对象，在节点中通过runtime.context获取context上下文数据
+    问题2：各个节点执行过程中，需要实时将执行步骤状态返回给前段，前端实时渲染
+    解决方案：流式调用+SSE
+        1.调用graph.astream(input=input, context=context, stream_mode="custom")
+        2.在节点中获取流写入器，输出自定义数据
+            方式一：get_stream_writer()
+            方式二：通过runtime对象获取流写入器runtime.stream_writer
 
-
-
-
-
-
+基于经典的**TF-IDF（词频 - 逆文档频率）** 算法：
+- TF（词频）：衡量词在当前文本中出现的频率，频率越高越可能是关键词； 
+   例如：我喜欢编程，编程很有趣 分词后：我 喜欢 编程 编程 很 有趣
+   TF(编程) = 2/5 = 0.4
+- IDF（逆文档频率）：衡量词在整个语料库中的稀缺性，越稀缺（仅在少数文本出现）的词，区分度越高，权重越大。降低烂大街词语的权重
+    例如：语料库有5篇文档，其中有3篇文档包含关键词“的”，"a","我“，则IDF(编程) = log(5/3) = 0.415
+每个词都是 TF*IDF得到词得分 按得分从高到低返回
+- 

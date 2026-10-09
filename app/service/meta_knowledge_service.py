@@ -157,7 +157,7 @@ class MetaKnowledgeService:
         # 2.获取字段取值信息
         value_infos:list[ValueInfo] = []
         # 2.1 从yaml中获取需要建立全文索引字段名称列表
-        need_sync_to_es = [column.name for table in table_configs for column in table.columns if column.sync is True]
+        need_sync_to_es:list[str] = [column.name for table in table_configs for column in table.columns if column.sync is True]
 
         # 2.2 遍历字段信息列表 只要该字段需要建立全文索引，构建ES文档对象：ValueInfo
         for column_info in column_infos:
