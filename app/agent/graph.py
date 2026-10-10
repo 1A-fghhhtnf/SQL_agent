@@ -27,7 +27,7 @@ from app.repositories.mysql.meta_mysql_repository import MetaMySQLRepository
 from app.repositories.qdrant.column_qdrant_repository import ColumnQdrantRepository
 from app.repositories.qdrant.metric_qdrant_repository import MetricQdrantRepository
 
-#1.创建图构建器对象
+#1.创建图构建器对象 state_schema：节点读写  context_schema：节点只读
 graph_builder = StateGraph(state_schema=DataAgentState, context_schema=DataAgentContext)
 
 #2.新增节点
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     #1.异步步调用
     async def test_graph():
         #1.创建状态
-        state = DataAgentState(query="统计华北地区销售额")
+        state = DataAgentState(query="2025 年 2 月各品类的订单金额排名")
         #2.创建上下文对象
         #2.1 执行客户端初始化操作
         dw_mysql_client_manager.init()

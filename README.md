@@ -232,4 +232,39 @@ LangGraph: 核心概念
 - IDF（逆文档频率）：衡量词在整个语料库中的稀缺性，越稀缺（仅在少数文本出现）的词，区分度越高，权重越大。降低烂大街词语的权重
     例如：语料库有5篇文档，其中有3篇文档包含关键词“的”，"a","我“，则IDF(编程) = log(5/3) = 0.415
 每个词都是 TF*IDF得到词得分 按得分从高到低返回
-- 
+
+
+MySQL SQL语句性能分析：执行计划 explain 用于验证SQL性能瓶颈
+
+explain SELECT * from fact_order; 
+    全表扫描性能差，MySQL数据提取过程，存储引擎从磁盘上提取数据文件，每次提取一页（Page）大小默认16KB  IO次数多，导致查询性能差
+    索引提高查询效率：索引底层采用B+Tree结构，B+Tree结构使得索引具有高效的查询性能。 树高度3层情况，容纳千万级数据，只需要3次IO命中数据
+    https://blog.csdn.net/yin767833376/article/details/81511377
+    执行计划指标：重点看 type、key、rows、Extra
+    Type取值：ALL(全表扫描), INDEX（全索引扫描）,Range(范围扫描，一般大于等于),ref(普通索引等值)，const(主键索引、唯一索引)
+explain SELECT * from fact_order;
+ 1	SIMPLE	fact_order		ALL					115	100.00	
+
+explain SELECT * from fact_order where order_id ='ORD20250101001' 根据主键ID
+1	SIMPLE	fact_order		const	PRIMARY	PRIMARY	122	const	1	100.00	
+
+explain SELECT order_id from fact_order ;
+1	SIMPLE	fact_order		index		PRIMARY	122		115	100.00	Using index
+
+
+explain SELECT * from fact_order where order_id>'1';
+1	SIMPLE	fact_order		range	PRIMARY	PRIMARY	122		115	100.00	Using where
+
+explain SELECT * from fact_order where region_id ='a' # 为region_id建立索引
+1	SIMPLE	fact_order		ref	idx_region_id	idx_region_id	83	const	1	100.00	
+
+
+
+
+
+
+
+
+
+
+    

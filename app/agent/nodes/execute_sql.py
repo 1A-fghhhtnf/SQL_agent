@@ -7,13 +7,20 @@ from app.core.log import logger
 
 
 async def execute_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]):
+    """执行SQL：执行数仓查询，将查询结果返回"""
     writer = get_stream_writer()
     try:
         writer({"type": "progress", "step": "执行SQL", "status": "running"})
-        #TODO 业务逻辑
-        writer({"type": "progress", "step": "执行SQL", "status": "success"})
+        #1.从state获取业务SQL‘
+        sql = state["sql"]
 
-        writer({"type": "result", "data":None})
+        #2.执行数仓查询（dw库）
+        dw_mysql_repository = runtime.context["dw_mysql_repository"]
+        data = await dw_mysql_repository.execute_sql(sql)
+        writer({"type": "progress", "step": "执行SQL", "status": "success"})
+        logger.info("SQL执行结果：{}", data)
+        #3.将查询结果写回
+        writer({"type": "result", "data":data})
     except Exception as e:
         logger.error(str(e))
         writer({"type": "progress", "step": "执行SQL", "status": "error"})

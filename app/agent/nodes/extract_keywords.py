@@ -38,20 +38,3 @@ async def extract_keywords(state: DataAgentState, runtime: Runtime[DataAgentCont
     except Exception as e:
         writer({"type": "progress", "step": "抽取关键词", "status": "error"})
         raise e
-
-if __name__ == '__main__':
-    allow_pos = (
-        "n",  # 名词: 数据、服务器、表格
-        "nr",  # 人名: 张三、李四
-        "ns",  # 地名: 北京、上海
-        "nt",  # 机构团体名: 政府、学校、某公司
-        "nz",  # 其他专有名词: Unicode、哈希算法、诺贝尔奖
-        "v",  # 动词: 运行、开发
-        "vn",  # 名动词: 工作、研究
-        "a",  # 形容词: 美丽、快速
-        "an",  # 名形词: 难度、合法性、复杂度
-        "eng",  # 英文
-        "i",  # 成语
-        "l",  # 常用固定短语
-    )
-    print(jieba.analyse.extract_tags("我喜欢编程，编程跟有趣",topK=20, withWeight=True, allowPOS=allow_pos))

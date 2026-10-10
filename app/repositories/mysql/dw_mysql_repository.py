@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import text, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,3 +27,23 @@ class DwMySQLRepository:
         result: Result = await self.session.execute(text(sql))
         #执行自定义SQL解析单列多行结果
         return result.scalars().fetchall()
+
+    async def get_db_info(self)->dict[str, str]:
+        """获取数仓数据库方言跟数据局版本"""
+        db_info_dict={}
+        sql = "SELECT VERSION()"
+        result:Result = await self.session.execute(text(sql))
+        db_info_dict['version'] = result.scalar()
+        db_info_dict['dialect'] = self.session.get_bind().dialect.name
+        return db_info_dict
+
+    async def validate_sql(self, sql:str):
+        """验证SQL语句合法性"""
+        sql =f"EXPLAIN {sql}"
+        await self.session.execute(text(sql))
+
+    async def execute_sql(self, sql:str)->list[dict[str,Any]]:
+        """执行自定义SQL并返回结果"""
+        result:Result = await self.session.execute(text(sql))
+        #将结果每行记录转为字典：{字段名称/别名:字段值}  多行记录[{},{},{}]
+        return result.mappings().fetchall()
