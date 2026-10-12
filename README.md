@@ -261,10 +261,41 @@ explain SELECT * from fact_order where region_id ='a' # 为region_id建立索引
 
 
 
+yield:是 Python 里用来把普通函数变成「生成器」的关键字 
+  作用：暂停、返回、继续执行（保存方法状态） 跟return区别 返回结果，销毁函数
 
 
+需求：后端将graph工作流节点执行状态实时返回给前端 
+解决：FastAPI流式响应+Graph流式调用+SSE协议
+    一、graph调用采用astream()
+    二、graph调用返回chunk块内容（遵循SSE协议 data: 内容\n\n） 通过FastAPI的流式响应返回
 
+    async def fake_video_streamer():
+    for i in range(10):
+        yield f"data: stage:{i} \n\n"
+        await anyio.sleep(1)
 
-
-
+    @hello_router.get("/api/streaming")
+    async def get_streaming():
+        return StreamingResponse(fake_video_streamer(), media_type="text/event-stream;charset=utf-8")
     
+FastAPI生命周期： 解决：应用启动执行初始化操作；应用在运行中处理用户提问；应用关闭执行销毁操作
+    1.声明生命周期函数
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            yield
+        2.yield之前的项目启动执行
+        3.yield之后的项目关闭执行
+    2.将声明周期函数对象添加到FastAPI应用中
+        app = FastAPI(lifespan=lifespan)
+
+FastAPI依赖注入：
+    1.声明被依赖对象(同步/异步)函数，提升性能采用装饰器@lru_cache @alru_cache
+    2.某个函数中使用被依赖项目 方法名(变量:Annotated[变量类型, Depends(函数对象)])
+    yield 的数据库依赖项Session,创建持久层对象传入Session，操作完数据库后，将Session销毁掉
+    async def get_meta_session()->AsyncSession:
+        async with meta_mysql_client_manager.session_factory() as session:
+            try:
+                yield session
+            finally:
+                await session.aclose()

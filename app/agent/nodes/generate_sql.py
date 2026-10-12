@@ -33,7 +33,7 @@ async def generate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]
         })
         writer({"type": "progress", "step": "生成SQL", "status": "success"})
         logger.info("生成的SQL：{}", sql)
-        #3.更新State状态
+        #3.更新State状态n
         return {"sql": sql}
     except Exception as e:
         logger.error(str(e))

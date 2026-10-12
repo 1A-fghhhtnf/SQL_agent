@@ -80,14 +80,14 @@ if __name__ == '__main__':
         #1.创建状态
         state = DataAgentState(query="2025 年 2 月各品类的订单金额排名")
         #2.创建上下文对象
-        #2.1 执行客户端初始化操作
+        #2.1 执行客户端初始化操作 TODO 改为fastAPI生命周期管理
         dw_mysql_client_manager.init()
         meta_mysql_client_manager.init()
         embedding_client_manager.init()
         es_client_manager.init()
         qdrant_client_manger.init()
 
-        #2.2 创建持久层对象
+        #2.2 创建持久层对象 TODO 使用FastAPI依赖注入
         async with (dw_mysql_client_manager.session_factory() as dw_session, meta_mysql_client_manager.session_factory() as meta_session):
             context = DataAgentContext(
                 dw_mysql_repository=DwMySQLRepository(dw_session),
@@ -100,10 +100,11 @@ if __name__ == '__main__':
             # result = await graph.ainvoke(input=state, context=context)
             #3.调用graph 普通调用invoke/ainvoke 一次性将所有状态输出
             # print(result)
-            #4.调用graph 流式调用，逐个状态输出 流模式默认：values:每个步骤输出完整state  updates:每个步骤输出更新部分 custom:自定义输出
+            #4.调用graph 流式调用，逐个状态输出 流模式默认：values:每个步骤输出完整state 默认updates:每个步骤输出更新部分 custom:自定义输出
             async for chunk in graph.astream(input=state, context=context, stream_mode="custom"):
+                #TODO 通过SSE协议实时返回给客户端
                 print(chunk)
-        #5.关闭客户端
+        #5.关闭客户端 TODO 改为fastAPI生命周期管理
         await dw_mysql_client_manager.close()
         await meta_mysql_client_manager.close()
         await es_client_manager.close()

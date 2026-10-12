@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any
 
 from sqlalchemy import text, Result
@@ -46,4 +47,4 @@ class DwMySQLRepository:
         """执行自定义SQL并返回结果"""
         result:Result = await self.session.execute(text(sql))
         #将结果每行记录转为字典：{字段名称/别名:字段值}  多行记录[{},{},{}]
-        return result.mappings().fetchall()
+        return [dict(row_mapping) for row_mapping in result.mappings().fetchall()]
