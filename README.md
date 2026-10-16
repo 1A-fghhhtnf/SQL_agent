@@ -1,4 +1,4 @@
-项目git地址：https://gitee.com/lvhonlgong/bj260706-data-agent.git
+项目git地址：https://gitee.com/Rice0417/SQL_agent.git
 在线流程图：https://www.kdocs.cn/l/cph6rDPFAJmB
 
 
